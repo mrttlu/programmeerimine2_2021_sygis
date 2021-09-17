@@ -61,7 +61,7 @@ interface Excuse {
   description: string;
   createdBy: number;
   category: number;
-  public: boolean;
+  visibility: string;
 }
 
 /**
@@ -107,7 +107,7 @@ const db: Db = {
       description: 'Ei viitsinud teha',
       category: 1,
       createdBy: 1,
-      public: true,
+      visibility: 'Public',
     },
   ],
 };
@@ -326,6 +326,133 @@ app.patch('/categories/:id', (req: Request, res: Response) => {
     });
   }
   db.categories[index].name = name;
+  return res.status(responseCodes.noContent).json({});
+});
+
+/**
+ * *********************** Excuses ******************
+ * Get all excuses
+ */
+app.get('/excuses', (req: Request, res: Response) => {
+  const { excuses } = db;
+  return res.status(responseCodes.ok).json({
+    excuses,
+  });
+});
+
+/**
+ * Get excuse by id
+ */
+app.get('/excuses/:id', (req: Request, res: Response) => {
+  const id: number = parseInt(req.params.id, 10);
+  if (!id) {
+    return res.status(responseCodes.badRequest).json({
+      error: 'No valid id provided',
+    });
+  }
+  const excuse = db.excuses.find((element) => element.id === id);
+  if (!excuse) {
+    return res.status(responseCodes.badRequest).json({
+      error: `No excuse found with id: ${id}`,
+    });
+  }
+  return res.status(responseCodes.ok).json({
+    excuse,
+  });
+});
+
+/**
+ * Remove excuse by id
+ */
+app.delete('/excuses/:id', (req: Request, res: Response) => {
+  const id: number = parseInt(req.params.id, 10);
+  if (!id) {
+    return res.status(responseCodes.badRequest).json({
+      error: 'No valid id provided',
+    });
+  }
+  const index = db.excuses.findIndex((element) => element.id === id);
+  if (index < 0) {
+    return res.status(responseCodes.badRequest).json({
+      message: `Excuse not found with id: ${id}`,
+    });
+  }
+  db.excuses.splice(index, 1);
+  return res.status(responseCodes.noContent).json({});
+});
+
+/**
+ * Create excuse
+ */
+app.post('/excuses', (req: Request, res: Response) => {
+  const {
+    description,
+    createdBy,
+    category,
+    visibility,
+  } = req.body;
+
+  if (!description) {
+    return res.status(responseCodes.badRequest).json({
+      error: 'Excuse description is required',
+    });
+  }
+  if (!createdBy) {
+    return res.status(responseCodes.badRequest).json({
+      error: 'Created by id is required',
+    });
+  }
+  if (!category) {
+    return res.status(responseCodes.badRequest).json({
+      error: 'Category id is required',
+    });
+  }
+  if (!visibility) {
+    return res.status(responseCodes.badRequest).json({
+      error: 'Visibility is required',
+    });
+  }
+  const id = db.excuses.length + 1;
+  const excuse: Excuse = {
+    id,
+    description,
+    createdBy,
+    category,
+    visibility,
+  };
+  db.excuses.push(excuse);
+  return res.status(responseCodes.created).json({
+    id,
+  });
+});
+
+/**
+ * Update excuse
+ */
+app.patch('/excuses/:id', (req: Request, res: Response) => {
+  const id: number = parseInt(req.params.id, 10);
+  const { description, category, visibility } = req.body;
+  if (!description && !category && !visibility) {
+    return res.status(responseCodes.badRequest).json({
+      error: 'Nothing to update',
+    });
+  }
+  const index = db.excuses.findIndex((element) => element.id === id);
+  if (index < 0) {
+    return res.status(responseCodes.badRequest).json({
+      error: `No excuse found with id: ${id}`,
+    });
+  }
+  if (description) {
+    db.excuses[index].description = description;
+  }
+  if (category) {
+    db.excuses[index].category = category;
+  }
+  if (visibility) {
+    db.excuses[index].visibility = visibility;
+  }
+
   return res.status(responseCodes.noContent).json({});
 });
 
