@@ -2,6 +2,10 @@
  * Import express framewrok
  */
 import express, { Request, Response, Application } from 'express';
+/**
+ * Import Cors
+ * What is CORS?: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+ */
 import cors from 'cors';
 
 /**
@@ -229,5 +233,6 @@ app.patch('/users/:id', (req: Request, res: Response) => {
  * Start listening
  */
 app.listen(port, () => {
+  // eslint-disable-next-line no-console
   console.log(`Server is running on port: ${port}`);
 });
