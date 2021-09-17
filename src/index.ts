@@ -1,5 +1,5 @@
 /**
- * Import express framewrok
+ * Import express framework
  */
 import express, { Request, Response, Application } from 'express';
 /**
@@ -122,6 +122,7 @@ app.get('/ping', (req: Request, res: Response) => {
 });
 
 /**
+ * *********************** Users ******************
  * Get all users
  */
 app.get('/users', (req: Request, res: Response) => {
@@ -226,6 +227,105 @@ app.patch('/users/:id', (req: Request, res: Response) => {
   if (lastName) {
     db.users[index].lastName = lastName;
   }
+  return res.status(responseCodes.noContent).json({});
+});
+
+/**
+ * *********************** Categories ******************
+ * Get all categories
+ */
+app.get('/categories', (req: Request, res: Response) => {
+  const { categories } = db;
+  return res.status(responseCodes.ok).json({
+    categories,
+  });
+});
+
+/**
+ * Get category by id
+ */
+app.get('/categories/:id', (req: Request, res: Response) => {
+  const id: number = parseInt(req.params.id, 10);
+  if (!id) {
+    return res.status(responseCodes.badRequest).json({
+      error: 'No valid id provided',
+    });
+  }
+  const category = db.categories.find((element) => element.id === id);
+  if (!category) {
+    return res.status(responseCodes.badRequest).json({
+      error: `No category found with id: ${id}`,
+    });
+  }
+  return res.status(responseCodes.ok).json({
+    category,
+  });
+});
+
+/**
+ * Remove category by id
+ */
+app.delete('/categories/:id', (req: Request, res: Response) => {
+  const id: number = parseInt(req.params.id, 10);
+  if (!id) {
+    return res.status(responseCodes.badRequest).json({
+      error: 'No valid id provided',
+    });
+  }
+  const index = db.categories.findIndex((element) => element.id === id);
+  if (index < 0) {
+    return res.status(responseCodes.badRequest).json({
+      message: `Category not found with id: ${id}`,
+    });
+  }
+  db.categories.splice(index, 1);
+  return res.status(responseCodes.noContent).json({});
+});
+
+/**
+ * Create category
+ */
+app.post('/categories', (req: Request, res: Response) => {
+  const { name, createdBy } = req.body;
+  if (!name) {
+    return res.status(responseCodes.badRequest).json({
+      error: 'Category name is required',
+    });
+  }
+  if (!createdBy) {
+    return res.status(responseCodes.badRequest).json({
+      error: 'Created by id is required',
+    });
+  }
+  const id = db.users.length + 1;
+  db.categories.push({
+    id,
+    name,
+    createdBy,
+  });
+  return res.status(responseCodes.created).json({
+    id,
+  });
+});
+
+/**
+ * Update category
+ */
+app.patch('/categories/:id', (req: Request, res: Response) => {
+  const id: number = parseInt(req.params.id, 10);
+  const { name } = req.body;
+  if (!name) {
+    return res.status(responseCodes.badRequest).json({
+      error: 'Nothing to update',
+    });
+  }
+  const index = db.categories.findIndex((element) => element.id === id);
+  if (index < 0) {
+    return res.status(responseCodes.badRequest).json({
+      error: `No category found with id: ${id}`,
+    });
+  }
+  db.categories[index].name = name;
   return res.status(responseCodes.noContent).json({});
 });
 
