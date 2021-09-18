@@ -16,7 +16,7 @@ import cors from 'cors';
 /**
  * Import API documentation file
  */
-import swaggerDocument from '../openApi';
+import swaggerDocument from '../openApi.json';
 /**
  * Create express app
  */
@@ -108,12 +108,17 @@ const db: Db = {
   categories: [
     {
       id: 1,
-      name: 'Kool',
+      name: 'Koolitööd',
       createdBy: 1,
     },
     {
       id: 2,
       name: 'Kodu',
+      createdBy: 2,
+    },
+    {
+      id: 3,
+      name: 'Töö',
       createdBy: 2,
     },
   ],
@@ -122,6 +127,34 @@ const db: Db = {
       id: 1,
       description: 'Ei viitsinud teha',
       category: 1,
+      createdBy: 1,
+      visibility: 'Public',
+    },
+    {
+      id: 2,
+      description: 'Ei tahtnud teha',
+      category: 1,
+      createdBy: 1,
+      visibility: 'Public',
+    },
+    {
+      id: 3,
+      description: 'Ei jõudnud teha',
+      category: 1,
+      createdBy: 1,
+      visibility: 'Public',
+    },
+    {
+      id: 4,
+      description: 'Ei osanud teha',
+      category: 1,
+      createdBy: 1,
+      visibility: 'Public',
+    },
+    {
+      id: 4,
+      description: 'Ei tahtnud koristada',
+      category: 2,
       createdBy: 1,
       visibility: 'Public',
     },
@@ -347,12 +380,40 @@ app.patch('/categories/:id', (req: Request, res: Response) => {
 
 /**
  * *********************** Excuses ******************
- * Get all excuses
+ * Get excuses
  */
 app.get('/excuses', (req: Request, res: Response) => {
+  const { category } = req.query;
   const { excuses } = db;
+  if (!category) {
+    return res.status(responseCodes.ok).json({
+      excuses,
+    });
+  }
+  const foundCategory = db.categories.find((element) => element.name === category);
+  if (!foundCategory) {
+    return res.status(responseCodes.badRequest).json({
+      error: `No ${category} found`,
+    });
+  }
+  const excusesInCategory = excuses.filter((element) => element.category === foundCategory.id);
+  if (!excusesInCategory || excusesInCategory.length < 1) {
+    return res.status(responseCodes.badRequest).json({
+      error: `No excuses found in ${category}`,
+    });
+  }
   return res.status(responseCodes.ok).json({
-    excuses,
+    excuses: excusesInCategory,
+  });
+});
+/**
+ * Get random excuse
+ */
+app.get('/excuses/random', (req: Request, res: Response) => {
+  const random = Math.round(Math.random() * (db.excuses.length - 1));
+  const excuse: Excuse = db.excuses[random];
+  return res.status(responseCodes.ok).json({
+    excuse,
   });
 });
 
