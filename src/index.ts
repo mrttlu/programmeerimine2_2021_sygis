@@ -1,13 +1,22 @@
+/* eslint-disable import/extensions */
+/* eslint-disable import/no-unresolved */
 /**
  * Import express framework
  */
 import express, { Request, Response, Application } from 'express';
 /**
- * Import Cors
+ * Swagger UI for API documentation
+ */
+import swaggerUi from 'swagger-ui-express';
+/**
+ * Import Cors (needed because of API documentation in this project)
  * What is CORS?: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
  */
 import cors from 'cors';
-
+/**
+ * Import API documentation file
+ */
+import swaggerDocument from '../openApi';
 /**
  * Create express app
  */
@@ -17,7 +26,14 @@ const app: Application = express();
  * Middleware for creating request body object
  */
 app.use(express.json());
+/**
+ * Register CORS middleware
+ */
 app.use(cors());
+/**
+ * Register API documentation middleware
+ */
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 /**
  * Port number for express app
