@@ -2,7 +2,7 @@
   "openapi": "3.0.2",
   "info": {
     "title": "Excuses API",
-    "version": "1.0"
+    "version": "0.1.0"
   },
   "servers": [
     {
@@ -14,15 +14,18 @@
       "id": {
         "type": "number",
         "description": "Resource id",
+        "additionalProperties": false,
         "example": 1
       },
       "description": {
         "type": "string",
-        "description": "Resource description"
+        "description": "Resource description",
+        "additionalProperties": false
       },
       "name": {
         "type": "string",
-        "description": "Resource name"
+        "description": "Resource name",
+        "additionalProperties": false
       },
       "firstName": {
         "type": "string",
@@ -38,6 +41,8 @@
       },
       "user": {
         "type": "object",
+        "description": "User object",
+        "additionalProperties": false,
         "properties": {
           "id": {
             "$ref": "#/components/schemas/id"
