@@ -17,6 +17,13 @@ import cors from 'cors';
  * Import API documentation file
  */
 import swaggerDocument from '../openapi.json';
+
+import db from './db';
+import usersController from './components/users/controller';
+
+import responseCodes from './components/general/responseCodes';
+import { port } from './components/general/settings';
+import logger from './components/general/loggerMiddleware';
 /**
  * Create express app
  */
@@ -30,6 +37,8 @@ app.use(express.json());
  * Register CORS middleware
  */
 app.use(cors());
+
+app.use(logger);
 /**
  * Register API documentation middleware
  */
@@ -38,36 +47,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 /**
  * Port number for express app
  */
-const port = 3000;
-
-/**
- * Http response codes
- */
-const responseCodes = {
-  ok: 200,
-  created: 201,
-  noContent: 204,
-  badRequest: 400,
-  notFound: 404,
-};
-
-/**
- * User interface
- */
-interface User {
-  id: number;
-  firstName: string;
-  lastName: string;
-}
-
-/**
- * Category interface
- */
-interface Category {
-  id: number;
-  name: string;
-  createdBy: number;
-}
+// const port = 3000;
 
 /**
  * Excuse interface
@@ -81,87 +61,6 @@ interface Excuse {
 }
 
 /**
- * Database interface
- */
-interface Db {
-  users: User[];
-  categories: Category[];
-  excuses: Excuse[];
-}
-
-/**
- * Mock database
- */
-const db: Db = {
-  users: [
-    {
-      id: 1,
-      firstName: 'Juku',
-      lastName: 'Juurikas',
-    },
-    {
-      id: 2,
-      firstName: 'Mari',
-      lastName: 'Maasikas',
-    },
-  ],
-  categories: [
-    {
-      id: 1,
-      name: 'Koolitööd',
-      createdBy: 1,
-    },
-    {
-      id: 2,
-      name: 'Kodu',
-      createdBy: 2,
-    },
-    {
-      id: 3,
-      name: 'Töö',
-      createdBy: 2,
-    },
-  ],
-  excuses: [
-    {
-      id: 1,
-      description: 'Ei viitsinud teha',
-      category: 1,
-      createdBy: 1,
-      visibility: 'Public',
-    },
-    {
-      id: 2,
-      description: 'Ei tahtnud teha',
-      category: 1,
-      createdBy: 1,
-      visibility: 'Public',
-    },
-    {
-      id: 3,
-      description: 'Ei jõudnud teha',
-      category: 1,
-      createdBy: 1,
-      visibility: 'Public',
-    },
-    {
-      id: 4,
-      description: 'Ei osanud teha',
-      category: 1,
-      createdBy: 1,
-      visibility: 'Public',
-    },
-    {
-      id: 5,
-      description: 'Ei tahtnud koristada',
-      category: 2,
-      createdBy: 1,
-      visibility: 'Public',
-    },
-  ],
-};
-
-/**
  * API test endpoint
  */
 app.get('/ping', (req: Request, res: Response) => {
@@ -172,112 +71,12 @@ app.get('/ping', (req: Request, res: Response) => {
 
 /**
  * *********************** Users ******************
- * Get all users
  */
-app.get('/users', (req: Request, res: Response) => {
-  const { users } = db;
-  return res.status(responseCodes.ok).json({
-    users,
-  });
-});
-
-/**
- * Get user by id
- */
-app.get('/users/:id', (req: Request, res: Response) => {
-  const id: number = parseInt(req.params.id, 10);
-  if (!id) {
-    return res.status(responseCodes.badRequest).json({
-      error: 'No valid id provided',
-    });
-  }
-  const user = db.users.find((element) => element.id === id);
-  if (!user) {
-    return res.status(responseCodes.badRequest).json({
-      error: `No user found with id: ${id}`,
-    });
-  }
-  return res.status(responseCodes.ok).json({
-    user,
-  });
-});
-
-/**
- * Remove user by id
- */
-app.delete('/users/:id', (req: Request, res: Response) => {
-  const id: number = parseInt(req.params.id, 10);
-  if (!id) {
-    return res.status(responseCodes.badRequest).json({
-      error: 'No valid id provided',
-    });
-  }
-  const index = db.users.findIndex((element) => element.id === id);
-  if (index < 0) {
-    return res.status(responseCodes.badRequest).json({
-      message: `User not found with id: ${id}`,
-    });
-  }
-  db.users.splice(index, 1);
-  return res.status(responseCodes.noContent).json({});
-});
-
-/**
- * Create user
- */
-app.post('/users', (req: Request, res: Response) => {
-  const { firstName, lastName } = req.body;
-  if (!firstName) {
-    return res.status(responseCodes.badRequest).json({
-      error: 'First name is required',
-    });
-  }
-  if (!lastName) {
-    return res.status(responseCodes.badRequest).json({
-      error: 'Last name is required',
-    });
-  }
-  const id = db.users.length + 1;
-  db.users.push({
-    id,
-    firstName,
-    lastName,
-  });
-  return res.status(responseCodes.created).json({
-    id,
-  });
-});
-
-/**
- * Update user
- */
-app.patch('/users/:id', (req: Request, res: Response) => {
-  const id: number = parseInt(req.params.id, 10);
-  const { firstName, lastName } = req.body;
-  if (!id) {
-    return res.status(responseCodes.badRequest).json({
-      error: 'No valid id provided',
-    });
-  }
-  if (!firstName && !lastName) {
-    return res.status(responseCodes.badRequest).json({
-      error: 'Nothing to update',
-    });
-  }
-  const index = db.users.findIndex((element) => element.id === id);
-  if (index < 0) {
-    return res.status(responseCodes.badRequest).json({
-      error: `No user found with id: ${id}`,
-    });
-  }
-  if (firstName) {
-    db.users[index].firstName = firstName;
-  }
-  if (lastName) {
-    db.users[index].lastName = lastName;
-  }
-  return res.status(responseCodes.noContent).json({});
-});
+app.get('/users', usersController.getAllUsers);
+app.get('/users/:id', usersController.getUserById);
+app.delete('/users/:id', usersController.removeUser);
+app.post('/users', usersController.createUser);
+app.patch('/users/:id', usersController.updateUser);
 
 /**
  * *********************** Categories ******************
