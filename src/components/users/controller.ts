@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import responseCodes from '../general/responseCodes';
 import usersService from './service';
+import { UpdateUser, NewUser } from './interfaces';
 
 const usersController = {
   getAllUsers: (req: Request, res: Response) => {
@@ -54,7 +55,11 @@ const usersController = {
         error: 'Last name is required',
       });
     }
-    const id = usersService.createUser(firstName, lastName);
+    const newUser: NewUser = {
+      firstName,
+      lastName,
+    };
+    const id = usersService.createUser(newUser);
     return res.status(responseCodes.created).json({
       id,
     });
@@ -78,7 +83,12 @@ const usersController = {
         error: `No user found with id: ${id}`,
       });
     }
-    usersService.updateUser({ id, firstName, lastName });
+    const updateUser: UpdateUser = {
+      id,
+      firstName,
+      lastName,
+    };
+    usersService.updateUser(updateUser);
     return res.status(responseCodes.noContent).json({});
   },
 };

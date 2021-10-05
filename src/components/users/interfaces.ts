@@ -1,10 +1,13 @@
 /**
  * User interface
  */
- interface User {
-  id: number;
+interface NewUser {
   firstName: string;
   lastName: string;
+}
+
+interface User extends NewUser{
+  id: number;
 }
 
 interface UpdateUser {
@@ -13,4 +16,4 @@ interface UpdateUser {
   lastName?: string;
 }
 
-export default User;
+export { User, UpdateUser, NewUser };

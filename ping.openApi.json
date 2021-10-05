@@ -1,0 +1,26 @@
+{
+  "get": {
+    "tags": [
+      "General operations"
+    ],
+    "description": "Endpoint for testing if API is operational",
+    "responses": {
+      "200": {
+        "description": "Alive message",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Alive"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
