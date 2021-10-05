@@ -1,16 +1,6 @@
 import { User } from './components/users/interfaces';
 import { Category } from './components/categories/interfaces';
-
-/**
- * Excuse interface
- */
-interface Excuse {
-  id: number;
-  description: string;
-  createdBy: number;
-  category: number;
-  visibility: string;
-}
+import { Excuse } from './components/excuses/interfaces';
 
 /**
  * Database interface

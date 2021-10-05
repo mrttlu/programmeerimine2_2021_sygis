@@ -37,12 +37,18 @@ const updateCategory = (category: UpdateCategory) => {
   }
 };
 
+const getCategoryByName = (categoryName: string) => {
+  const category = db.categories.find((element) => element.name === categoryName);
+  return category;
+};
+
 const categoriesService = {
   getAllCategories,
   getCategoryById,
   deleteCategory,
   createCategory,
   updateCategory,
+  getCategoryByName,
 };
 
 export default categoriesService;
