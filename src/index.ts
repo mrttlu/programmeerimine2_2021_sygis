@@ -1,11 +1,7 @@
 /**
  * Import express framework
  */
-import express, {
-  Request,
-  Response,
-  Application,
-} from 'express';
+import express, { Application } from 'express';
 /**
  * Swagger UI for API documentation
  */
@@ -20,14 +16,22 @@ import cors from 'cors';
  */
 import swaggerDocument from '../openapi.json';
 
+/**
+ * Import controllers
+ */
 import usersController from './components/users/controller';
 import categoriesController from './components/categories/controller';
 import excusesController from './components/excuses/controller';
-import excusesMiddlewares from './components/excuses/middlewares';
+import ping from './components/ping/controller';
 
-import responseCodes from './components/general/responseCodes';
-import { port } from './components/general/settings';
+/**
+ * Import middlewares
+ */
+import excusesMiddlewares from './components/excuses/middlewares';
 import logger from './components/general/loggerMiddleware';
+
+import { port } from './components/general/settings';
+
 /**
  * Create express app
  */
@@ -56,11 +60,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 /**
  * API test endpoint
  */
-app.get('/ping', (req: Request, res: Response) => {
-  res.status(responseCodes.ok).json({
-    message: 'Alive',
-  });
-});
+app.get('/ping', ping);
 
 /**
  * *********************** Users ******************
