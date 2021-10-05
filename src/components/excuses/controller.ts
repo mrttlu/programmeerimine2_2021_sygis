@@ -79,26 +79,6 @@ const createExcuse = (req: Request, res: Response) => {
     visibility,
   } = req.body;
 
-  if (!description) {
-    return res.status(responseCodes.badRequest).json({
-      error: 'Excuse description is required',
-    });
-  }
-  if (!createdBy) {
-    return res.status(responseCodes.badRequest).json({
-      error: 'Created by id is required',
-    });
-  }
-  if (!category) {
-    return res.status(responseCodes.badRequest).json({
-      error: 'Category id is required',
-    });
-  }
-  if (!visibility) {
-    return res.status(responseCodes.badRequest).json({
-      error: 'Visibility is required',
-    });
-  }
   const newExcuse: NewExcuse = {
     description,
     createdBy,

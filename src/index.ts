@@ -1,7 +1,11 @@
 /**
  * Import express framework
  */
-import express, { Request, Response, Application } from 'express';
+import express, {
+  Request,
+  Response,
+  Application,
+} from 'express';
 /**
  * Swagger UI for API documentation
  */
@@ -19,6 +23,7 @@ import swaggerDocument from '../openapi.json';
 import usersController from './components/users/controller';
 import categoriesController from './components/categories/controller';
 import excusesController from './components/excuses/controller';
+import excusesMiddlewares from './components/excuses/middlewares';
 
 import responseCodes from './components/general/responseCodes';
 import { port } from './components/general/settings';
@@ -82,7 +87,7 @@ app.get('/excuses', excusesController.getAllExcuses);
 app.get('/excuses/random', excusesController.getRandomExcuse);
 app.get('/excuses/:id', excusesController.getExcuseById);
 app.delete('/excuses/:id', excusesController.deleteExcuse);
-app.post('/excuses', excusesController.createExcuse);
+app.post('/excuses', excusesMiddlewares.validateCreateExcuse, excusesController.createExcuse);
 app.patch('/excuses/:id', excusesController.updateExcuse);
 
 /**
