@@ -1,13 +1,5 @@
-import User from './components/users/interfaces';
-
-/**
- * Category interface
- */
-interface Category {
-  id: number;
-  name: string;
-  createdBy: number;
-}
+import { User } from './components/users/interfaces';
+import { Category } from './components/categories/interfaces';
 
 /**
  * Excuse interface

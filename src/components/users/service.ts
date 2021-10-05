@@ -18,18 +18,16 @@ const usersService = {
     db.users.splice(index, 1);
     return true;
   },
-  createUser: (data: NewUser) => {
-    const { firstName, lastName } = data;
+  createUser: (newUser: NewUser) => {
     const id = db.users.length + 1;
     db.users.push({
       id,
-      firstName,
-      lastName,
+      ...newUser,
     });
     return id;
   },
-  updateUser: (data: UpdateUser): boolean => {
-    const { id, firstName, lastName } = data;
+  updateUser: (user: UpdateUser): boolean => {
+    const { id, firstName, lastName } = user;
     const index = db.users.findIndex((element) => element.id === id);
     if (firstName) {
       db.users[index].firstName = firstName;
