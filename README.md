@@ -10,3 +10,5 @@
 ## API documentation:
 * Start project - npm start
 * Go to http://localhost:3000/api-docs/
+
+## Test
