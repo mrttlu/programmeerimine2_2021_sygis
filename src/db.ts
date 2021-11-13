@@ -20,11 +20,17 @@ const db: Db = {
       id: 1,
       firstName: 'Juku',
       lastName: 'Juurikas',
+      email: 'juku@juurikas.ee',
+      password: 'juku',
+      role: 'Admin',
     },
     {
       id: 2,
       firstName: 'Mari',
       lastName: 'Maasikas',
+      email: 'mari@maasikas.ee',
+      password: 'mari',
+      role: 'User',
     },
   ],
   categories: [

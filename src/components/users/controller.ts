@@ -44,7 +44,9 @@ const usersController = {
     return res.status(responseCodes.noContent).json({});
   },
   createUser: (req: Request, res: Response) => {
-    const { firstName, lastName } = req.body;
+    const {
+      firstName, lastName, password, email,
+    } = req.body;
     if (!firstName) {
       return res.status(responseCodes.badRequest).json({
         error: 'First name is required',
@@ -55,9 +57,22 @@ const usersController = {
         error: 'Last name is required',
       });
     }
+    if (!email) {
+      return res.status(responseCodes.badRequest).json({
+        error: 'Email is required',
+      });
+    }
+    if (!password) {
+      return res.status(responseCodes.badRequest).json({
+        error: 'Password is required',
+      });
+    }
     const newUser: NewUser = {
       firstName,
       lastName,
+      email,
+      password,
+      role: 'User',
     };
     const id = usersService.createUser(newUser);
     return res.status(responseCodes.created).json({
