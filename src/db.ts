@@ -21,7 +21,7 @@ const db: Db = {
       firstName: 'Juku',
       lastName: 'Juurikas',
       email: 'juku@juurikas.ee',
-      password: 'juku',
+      password: '$2b$10$nevnzRS0jBjFh.KEYSoQ6u75M7FdLA7vXEgbbV9iHfU7W/.6W9hFa',
       role: 'Admin',
     },
     {
@@ -29,7 +29,7 @@ const db: Db = {
       firstName: 'Mari',
       lastName: 'Maasikas',
       email: 'mari@maasikas.ee',
-      password: 'mari',
+      password: '$2b$10$FY6sDSftFysyuOVqIpgc..qr./DoTxFCUUZALvqXUF98nz8/wlNeO',
       role: 'User',
     },
   ],

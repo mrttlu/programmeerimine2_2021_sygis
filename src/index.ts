@@ -22,6 +22,7 @@ import swaggerDocument from '../openApi.json';
 import usersController from './components/users/controller';
 import categoriesController from './components/categories/controller';
 import excusesController from './components/excuses/controller';
+import authController from './components/auth/controller';
 import ping from './components/ping/controller';
 
 /**
@@ -61,6 +62,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
  * API test endpoint
  */
 app.get('/ping', ping);
+
+/**
+ * *********************** Login ******************
+ */
+app.post('/login', authController.login);
 
 /**
  * *********************** Users ******************

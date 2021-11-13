@@ -43,7 +43,7 @@ const usersController = {
     usersService.removeUser(id);
     return res.status(responseCodes.noContent).json({});
   },
-  createUser: (req: Request, res: Response) => {
+  createUser: async (req: Request, res: Response) => {
     const {
       firstName, lastName, password, email,
     } = req.body;
@@ -74,7 +74,7 @@ const usersController = {
       password,
       role: 'User',
     };
-    const id = usersService.createUser(newUser);
+    const id = await usersService.createUser(newUser);
     return res.status(responseCodes.created).json({
       id,
     });
