@@ -9,13 +9,18 @@ const jwtService = {
       id: user.id,
       role: user.role,
     };
-    const token = await jwt.sign(payload, jwtPassword, { expiresIn: '1h'});
+    const token = await jwt.sign(payload, jwtPassword, { expiresIn: '1h' });
     return token;
   },
   verify: async (token: string) => {
-    const verify = await jwt.verify(token, jwtPassword);
-    return verify;
+    try {
+      const verify = await jwt.verify(token, jwtPassword);
+      return verify;
+    } catch (error) {
+      // console.log(error);
+      return false;
+    }
   },
-}
+};
 
 export default jwtService;
