@@ -22,6 +22,7 @@ import swaggerDocument from '../openApi.json';
 import usersController from './components/users/controller';
 import categoriesController from './components/categories/controller';
 import excusesController from './components/excuses/controller';
+import authController from './components/auth/controller';
 import ping from './components/ping/controller';
 
 /**
@@ -29,6 +30,8 @@ import ping from './components/ping/controller';
  */
 import excusesMiddlewares from './components/excuses/middlewares';
 import logger from './components/general/loggerMiddleware';
+import isLoggedIn from './components/auth/isLoggedInMiddleware';
+import isAdmin from './components/auth/isAdminMiddleware';
 
 import { port } from './components/general/settings';
 
@@ -63,12 +66,19 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.get('/ping', ping);
 
 /**
+ * *********************** Endpoints without loggedIn middleware ******************
+ */
+app.post('/login', authController.login);
+app.post('/users', usersController.createUser);
+
+app.use(isLoggedIn);
+
+/**
  * *********************** Users ******************
  */
-app.get('/users', usersController.getAllUsers);
+app.get('/users', isAdmin, usersController.getAllUsers);
 app.get('/users/:id', usersController.getUserById);
 app.delete('/users/:id', usersController.removeUser);
-app.post('/users', usersController.createUser);
 app.patch('/users/:id', usersController.updateUser);
 
 /**
