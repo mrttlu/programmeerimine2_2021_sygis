@@ -1,10 +1,14 @@
+import { getConnection, SimpleConsoleLogger } from 'typeorm';
 import db from '../../db';
 import { User, UpdateUser, NewUser } from './interfaces';
 import hashService from '../general/services/hashService';
+import eUser from './entity';
+
+const connection = getConnection();
 
 const usersService = {
-  getAllUsers: (): User[] => {
-    const { users } = db;
+  getAllUsers: async () => {
+    const users = await connection.getRepository(eUser).find();
     return users;
   },
   /**
@@ -14,8 +18,9 @@ const usersService = {
     const user = db.users.find((element) => element.id === id);
     return user;
   },
-  getUserByEmail: (email: string): User | undefined => {
-    const user = db.users.find((element) => element.email === email);
+  getUserByEmail: async (email: string) => {
+    const user = await connection.getRepository(eUser).findOne({ email });
+    console.log(user);
     return user;
   },
   removeUser: (id: number): boolean => {
@@ -24,14 +29,18 @@ const usersService = {
     return true;
   },
   createUser: async (newUser: NewUser) => {
-    const id = db.users.length + 1;
-    const hashedPassword = await hashService.hash(newUser.password);
-    db.users.push({
-      id,
-      ...newUser,
-      password: hashedPassword,
-    });
-    return id;
+    try {
+      const hashedPassword = await hashService.hash(newUser.password);
+      const user = {
+        ...newUser,
+        password: hashedPassword,
+      };
+      const result = await connection.getRepository(eUser).save(user);
+      return result.id;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
   },
   updateUser: (user: UpdateUser): boolean => {
     const { id, firstName, lastName } = user;

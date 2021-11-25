@@ -4,7 +4,7 @@ import { User } from '../../users/interfaces';
 const jwtPassword = 'klönasfölkjnasföjuhwerfiuhWERFOHU';
 
 const jwtService = {
-  sign: async (user: User) => {
+  sign: async (user: any) => {
     const payload = {
       id: user.id,
       role: user.role,

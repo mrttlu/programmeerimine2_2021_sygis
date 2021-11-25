@@ -6,7 +6,7 @@ const authController = {
   login: async (req: Request, res: Response) => {
     const { email, password } = req.body;
     const token = await loginService.login(email, password);
-    if(!token) {
+    if (!token) {
       return res.status(responseCodes.notAuthorized).json({
         error: 'Check credentials',
       });

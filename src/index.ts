@@ -14,7 +14,9 @@ import cors from 'cors';
 /**
  * Import API documentation file
  */
-import swaggerDocument from '../openApi.json';
+import swaggerDocument from '../openapi.json';
+
+import './database';
 
 /**
  * Import controllers
