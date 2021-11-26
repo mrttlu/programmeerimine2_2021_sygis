@@ -4,13 +4,13 @@ import usersService from './service';
 import { UpdateUser, NewUser } from './interfaces';
 
 const usersController = {
-  getAllUsers: (req: Request, res: Response) => {
-    const users = usersService.getAllUsers();
+  getAllUsers: async (req: Request, res: Response) => {
+    const users = await usersService.getAllUsers();
     return res.status(responseCodes.ok).json({
       users,
     });
   },
-  getUserById: (req: Request, res: Response) => {
+  getUserById: async (req: Request, res: Response) => {
     const id: number = parseInt(req.params.id, 10);
     if (!id) {
       return res.status(responseCodes.badRequest).json({
@@ -18,7 +18,7 @@ const usersController = {
       });
     }
     if ((id === res.locals.user.id) || (res.locals.user.role === 'Admin')) {
-      const user = usersService.getUserById(id);
+      const user = await usersService.getUserById(id);
       if (!user) {
         return res.status(responseCodes.badRequest).json({
           error: `No user found with id: ${id}`,
@@ -32,7 +32,7 @@ const usersController = {
       error: 'You have no permission for this info',
     });
   },
-  removeUser: (req: Request, res: Response) => {
+  removeUser: async (req: Request, res: Response) => {
     const id: number = parseInt(req.params.id, 10);
     if (!id) {
       return res.status(responseCodes.badRequest).json({
@@ -45,7 +45,7 @@ const usersController = {
         message: `User not found with id: ${id}`,
       });
     }
-    usersService.removeUser(id);
+    await usersService.removeUser(id);
     return res.status(responseCodes.noContent).json({});
   },
   createUser: async (req: Request, res: Response) => {

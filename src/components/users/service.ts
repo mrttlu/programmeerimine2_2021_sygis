@@ -1,37 +1,48 @@
+import pool from '../../database';
 import db from '../../db';
-import { User, UpdateUser, NewUser } from './interfaces';
+import { UpdateUser, NewUser } from './interfaces';
 import hashService from '../general/services/hashService';
 
 const usersService = {
-  getAllUsers: (): User[] => {
-    const { users } = db;
+  getAllUsers: async () => {
+    const [users] = await pool.query('SELECT id, firstName, lastName, email, dateCreated, role FROM users WHERE dateDeleted IS NULL');
     return users;
   },
   /**
    * Returns user or undefined
    */
-  getUserById: (id: number): User | undefined => {
-    const user = db.users.find((element) => element.id === id);
-    return user;
+  getUserById: async (id: number) => {
+    const [user]: any = await pool.query(
+      'SELECT id, firstName, lastName, email, dateCreated, dateUpdated, dateDeleted FROM users WHERE id = ? AND dateDeleted IS NULL', [id],
+    );
+    return user[0];
   },
-  getUserByEmail: (email: string): User | undefined => {
-    const user = db.users.find((element) => element.email === email);
-    return user;
+  getUserByEmail: async (email: string) => {
+    const [user]: any = await pool.query('SELECT * FROM users WHERE email = ? AND dateDeleted IS NULL', [email]);
+    return user[0];
   },
-  removeUser: (id: number): boolean => {
-    const index = db.users.findIndex((element) => element.id === id);
-    db.users.splice(index, 1);
-    return true;
+  removeUser: async (id: number) => {
+    try {
+      const result = await pool.query('UPDATE users SET dateDeleted = ? WHERE id = ?', [new Date(), id]);
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
   },
   createUser: async (newUser: NewUser) => {
-    const id = db.users.length + 1;
-    const hashedPassword = await hashService.hash(newUser.password);
-    db.users.push({
-      id,
-      ...newUser,
-      password: hashedPassword,
-    });
-    return id;
+    try {
+      const hashedPassword = await hashService.hash(newUser.password);
+      const user = {
+        ...newUser,
+        password: hashedPassword,
+      };
+      const [result]: any = await pool.query('INSERT INTO users SET ?', [user]);
+      return result.insertId;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
   },
   updateUser: (user: UpdateUser): boolean => {
     const { id, firstName, lastName } = user;
