@@ -10,7 +10,7 @@ const loginService = {
     if (!match) return false;
     const token = await jwtService.sign(user);
     return token;
-  }
-}
+  },
+};
 
 export default loginService;
