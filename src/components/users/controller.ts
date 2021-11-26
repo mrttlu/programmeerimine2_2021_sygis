@@ -45,7 +45,10 @@ const usersController = {
         message: `User not found with id: ${id}`,
       });
     }
-    await usersService.removeUser(id);
+    const response = await usersService.removeUser(id);
+    if (!response) {
+      return res.status(responseCodes.serverError).json({});
+    }
     return res.status(responseCodes.noContent).json({});
   },
   createUser: async (req: Request, res: Response) => {

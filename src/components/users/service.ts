@@ -5,9 +5,14 @@ import { IUpdateUser, INewUser, IUser } from './interfaces';
 import hashService from '../general/services/hashService';
 
 const usersService = {
-  getAllUsers: async () => {
-    const [users] = await pool.query('SELECT id, firstName, lastName, email, dateCreated, role FROM users WHERE dateDeleted IS NULL');
-    return users;
+  getAllUsers: async (): Promise<IUser[] | false> => {
+    try {
+      const [users]: [IUser[], FieldPacket[]] = await pool.query('SELECT id, firstName, lastName, email, dateCreated, role FROM users WHERE dateDeleted IS NULL');
+      return users;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
   },
   /**
    * Returns user or undefined

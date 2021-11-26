@@ -1,5 +1,5 @@
 import db from '../../db';
-import { Category } from '../categories/interfaces';
+import { ICategory } from '../categories/interfaces';
 import { Excuse, NewExcuse, UpdateExcuse } from './interfaces';
 
 const getAllExcuses = () => {
@@ -47,7 +47,7 @@ const updateExcuse = (excuseToUpdate: UpdateExcuse) => {
   }
 };
 
-const getExcusesByCataegory = (category: Category) => {
+const getExcusesByCataegory = (category: ICategory) => {
   const excusesInCategory = db.excuses.filter((element) => element.category === category.id);
   return excusesInCategory;
 };

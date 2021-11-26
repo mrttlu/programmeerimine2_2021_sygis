@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import excusesService from './service';
-import categoriesService from '../categories/service';
 import responseCodes from '../general/responseCodes';
 import { NewExcuse, UpdateExcuse } from './interfaces';
 
@@ -12,20 +11,9 @@ const getAllExcuses = (req: Request, res: Response) => {
       excuses,
     });
   }
-  const foundCategory = categoriesService.getCategoryByName(category.toString());
-  if (!foundCategory) {
-    return res.status(responseCodes.badRequest).json({
-      error: `No ${category} found`,
-    });
-  }
-  const excusesInCategory = excusesService.getExcusesByCataegory(foundCategory);
-  if (!excusesInCategory || excusesInCategory.length < 1) {
-    return res.status(responseCodes.badRequest).json({
-      error: `No excuses found in ${category}`,
-    });
-  }
+
   return res.status(responseCodes.ok).json({
-    excuses: excusesInCategory,
+    excuses,
   });
 };
 

@@ -1,23 +1,23 @@
 import { Request, Response } from 'express';
 import responseCodes from '../general/responseCodes';
 import categoriesService from './service';
-import { Category, NewCategory, UpdateCategory } from './interfaces';
+import { INewCategory, IUpdateCategory } from './interfaces';
 
-const getAllCategories = (req: Request, res: Response) => {
-  const categories = categoriesService.getAllCategories();
+const getAllCategories = async (req: Request, res: Response) => {
+  const categories = await categoriesService.getAllCategories();
   return res.status(responseCodes.ok).json({
     categories,
   });
 };
 
-const getCategoryById = (req: Request, res: Response) => {
+const getCategoryById = async (req: Request, res: Response) => {
   const id: number = parseInt(req.params.id, 10);
   if (!id) {
     return res.status(responseCodes.badRequest).json({
       error: 'No valid id provided',
     });
   }
-  const category = categoriesService.getCategoryById(id);
+  const category = await categoriesService.getCategoryById(id);
   if (!category) {
     return res.status(responseCodes.badRequest).json({
       error: `No category found with id: ${id}`,
@@ -28,47 +28,48 @@ const getCategoryById = (req: Request, res: Response) => {
   });
 };
 
-const deleteCategory = (req: Request, res: Response) => {
+const deleteCategory = async (req: Request, res: Response) => {
   const id: number = parseInt(req.params.id, 10);
   if (!id) {
     return res.status(responseCodes.badRequest).json({
       error: 'No valid id provided',
     });
   }
-  const category: Category | undefined = categoriesService.getCategoryById(id);
+  const category = await categoriesService.getCategoryById(id);
   if (!category) {
     return res.status(responseCodes.badRequest).json({
       message: `Category not found with id: ${id}`,
     });
   }
-  categoriesService.deleteCategory(category);
+  const result = await categoriesService.deleteCategory(id);
+  if (!result) {
+    return res.status(responseCodes.serverError).json({});
+  }
   return res.status(responseCodes.noContent).json({});
 };
 
-const createCategory = (req: Request, res: Response) => {
-  const { name, createdBy } = req.body;
+const createCategory = async (req: Request, res: Response) => {
+  const { name } = req.body;
+  const createdBy = res.locals.user.id;
   if (!name) {
     return res.status(responseCodes.badRequest).json({
       error: 'Category name is required',
     });
   }
-  if (!createdBy) {
-    return res.status(responseCodes.badRequest).json({
-      error: 'Created by id is required',
-    });
-  }
-  const newCategory: NewCategory = {
+  const newCategory: INewCategory = {
     name,
     createdBy,
   };
-  const id = categoriesService.createCategory(newCategory);
-
+  const id = await categoriesService.createCategory(newCategory);
+  if (!id) {
+    return res.status(responseCodes.serverError).json({});
+  }
   return res.status(responseCodes.created).json({
     id,
   });
 };
 
-const updateCategory = (req: Request, res: Response) => {
+const updateCategory = async (req: Request, res: Response) => {
   const id: number = parseInt(req.params.id, 10);
   const { name } = req.body;
   if (!name) {
@@ -76,18 +77,21 @@ const updateCategory = (req: Request, res: Response) => {
       error: 'Nothing to update',
     });
   }
-  const category = categoriesService.getCategoryById(id);
+  const category = await categoriesService.getCategoryById(id);
   if (!category) {
     return res.status(responseCodes.badRequest).json({
       error: `No category found with id: ${id}`,
     });
   }
-  const update: UpdateCategory = {
+  const update: IUpdateCategory = {
     id,
     name,
   };
 
-  categoriesService.updateCategory(update);
+  const result = await categoriesService.updateCategory(update);
+  if (!result) {
+    return res.status(responseCodes.serverError).json({});
+  }
   return res.status(responseCodes.noContent).json({});
 };
 

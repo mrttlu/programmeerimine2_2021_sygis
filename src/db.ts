@@ -1,11 +1,9 @@
-import { Category } from './components/categories/interfaces';
 import { Excuse } from './components/excuses/interfaces';
 
 /**
  * Database interface
  */
 interface Db {
-  categories: Category[];
   excuses: Excuse[];
 }
 
@@ -13,23 +11,6 @@ interface Db {
  * Mock database
  */
 const db: Db = {
-  categories: [
-    {
-      id: 1,
-      name: 'Koolitööd',
-      createdBy: 1,
-    },
-    {
-      id: 2,
-      name: 'Kodu',
-      createdBy: 2,
-    },
-    {
-      id: 3,
-      name: 'Töö',
-      createdBy: 2,
-    },
-  ],
   excuses: [
     {
       id: 1,

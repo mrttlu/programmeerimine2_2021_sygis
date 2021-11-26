@@ -1,19 +1,20 @@
+import { RowDataPacket } from 'mysql2';
 /**
  * Category interface
  */
 
-interface NewCategory {
+interface INewCategory {
   name: string;
   createdBy: number;
 }
 
-interface Category extends NewCategory {
+interface ICategory extends INewCategory, RowDataPacket {
   id: number;
 }
 
-interface UpdateCategory {
+interface IUpdateCategory {
   id: number;
   name: string;
 }
 
-export { NewCategory, Category, UpdateCategory };
+export { INewCategory, ICategory, IUpdateCategory };
