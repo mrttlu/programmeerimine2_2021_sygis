@@ -96,6 +96,7 @@ app.patch('/categories/:id', categoriesController.updateCategory);
 app.get('/excuses', excusesController.getAllExcuses);
 app.get('/excuses/random', excusesController.getRandomExcuse);
 app.get('/excuses/:id', excusesController.getExcuseById);
+app.get('/excuses/category/:id', excusesController.getExcusesByCategory);
 app.delete('/excuses/:id', excusesController.deleteExcuse);
 app.post('/excuses', excusesMiddlewares.validateCreateExcuse, excusesController.createExcuse);
 app.patch('/excuses/:id', excusesController.updateExcuse);

@@ -1,55 +1,141 @@
-import db from '../../db';
-import { ICategory } from '../categories/interfaces';
-import { Excuse, NewExcuse, UpdateExcuse } from './interfaces';
+/* eslint-disable no-console */
+import { FieldPacket, ResultSetHeader } from 'mysql2';
+import pool from '../../database';
+import { IExcuse, INewExcuse, IUpdateExcuse } from './interfaces';
 
-const getAllExcuses = () => {
-  const { excuses } = db;
-  return excuses;
-};
-
-const getRandomExcuse = () => {
-  const random = Math.round(Math.random() * (db.excuses.length - 1));
-  const excuse: Excuse = db.excuses[random];
-  return excuse;
-};
-
-const getExcuseById = (id: number) => {
-  const excuse = db.excuses.find((element) => element.id === id);
-  return excuse;
-};
-
-const createExcuse = (newExcuse: NewExcuse) => {
-  const id = db.excuses.length + 1;
-  const excuse: Excuse = {
-    id,
-    ...newExcuse,
-  };
-  db.excuses.push(excuse);
-  return id;
-};
-
-const deleteExcuse = (id: number) => {
-  const index = db.excuses.findIndex((element) => element.id === id);
-  db.excuses.splice(index, 1);
-  return true;
-};
-
-const updateExcuse = (excuseToUpdate: UpdateExcuse) => {
-  const index = db.excuses.findIndex((element) => element.id === excuseToUpdate.id);
-  if (excuseToUpdate.description) {
-    db.excuses[index].description = excuseToUpdate.description;
-  }
-  if (excuseToUpdate.category) {
-    db.excuses[index].category = excuseToUpdate.category;
-  }
-  if (excuseToUpdate.visibility) {
-    db.excuses[index].visibility = excuseToUpdate.visibility;
+const getAllExcuses = async (): Promise<IExcuse[] | false> => {
+  try {
+    const [excuses]: [IExcuse[], FieldPacket[]] = await pool.query(
+      `SELECT
+        E.id, E.description, E.dateCreated, E.dateUpdated, U.email AS createdBy, C.name AS category
+        FROM
+          excuses E
+        INNER JOIN
+          users U ON E.users_id = U.id
+        INNER JOIN
+          categories C ON E.categories_id = C.id
+        WHERE
+          E.dateDeleted IS NULL;`,
+    );
+    return excuses;
+  } catch (error) {
+    console.log(error);
+    return false;
   }
 };
 
-const getExcusesByCataegory = (category: ICategory) => {
-  const excusesInCategory = db.excuses.filter((element) => element.category === category.id);
-  return excusesInCategory;
+const getRandomExcuse = async (): Promise<IExcuse | false> => {
+  try {
+    const [excuses]: [IExcuse[], FieldPacket[]] = await pool.query(
+      `SELECT
+        E.id, E.description, E.description, E.dateCreated, E.dateUpdated, U.email AS createdBy, C.name AS category
+        FROM
+          excuses E
+        INNER JOIN
+          users U ON E.users_id = U.id
+        INNER JOIN
+          categories C ON E.categories_id = C.id
+        WHERE
+          E.dateDeleted IS NULL
+        ORDER BY RAND()
+        LIMIT 1;`,
+    );
+    return excuses[0];
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const getExcuseById = async (id: number): Promise<IExcuse | false> => {
+  try {
+    const [excuses]: [IExcuse[], FieldPacket[]] = await pool.query(
+      `SELECT
+        E.id, E.description, E.description, E.dateCreated, E.dateUpdated, U.email AS createdBy, C.name AS category
+        FROM
+          excuses E
+        INNER JOIN
+          users U ON E.users_id = U.id
+        INNER JOIN
+          categories C ON E.categories_id = C.id
+        WHERE
+          E.dateDeleted IS NULL AND E.id = ?
+        LIMIT 1;`, [id],
+    );
+    return excuses[0];
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const createExcuse = async (newExcuse: INewExcuse): Promise<number | false> => {
+  try {
+    const [result]: [ResultSetHeader, FieldPacket[]] = await pool.query(`
+      INSERT INTO excuses
+        SET
+          description = ?,
+          categories_id = ?,
+          users_id = ?,
+          visibility = ?
+      `,
+    [
+      newExcuse.description,
+      newExcuse.category,
+      newExcuse.createdBy,
+      newExcuse.visibility,
+    ]);
+    return result.insertId;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const deleteExcuse = async (id: number): Promise<boolean> => {
+  try {
+    await pool.query('UPDATE excuses SET dateDeleted = ? WHERE id = ?', [new Date(), id]);
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const updateExcuse = async (excuseToUpdate: IUpdateExcuse): Promise<boolean> => {
+  try {
+    await pool.query(`
+      UPDATE excuses SET ? WHERE id = ?
+    `, [
+      excuseToUpdate,
+      excuseToUpdate.id,
+    ]);
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const getExcusesByCategory = async (id: number): Promise<IExcuse[] | false> => {
+  try {
+    const [excuses]: [IExcuse[], FieldPacket[]] = await pool.query(`
+    SELECT
+      E.id, E.description, U.email AS createdBy, C.name AS category
+      FROM
+        excuses E
+      INNER JOIN
+        users U ON E.users_id = U.id
+      INNER JOIN
+        categories C ON E.categories_id = C.id
+      WHERE
+        E.dateDeleted IS NULL AND C.id = ?;`,
+    [id]);
+    return excuses;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
 };
 
 const excusesService = {
@@ -59,7 +145,7 @@ const excusesService = {
   createExcuse,
   deleteExcuse,
   updateExcuse,
-  getExcusesByCataegory,
+  getExcusesByCategory,
 };
 
 export default excusesService;

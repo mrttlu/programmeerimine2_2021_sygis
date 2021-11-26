@@ -1,37 +1,46 @@
 import { Request, Response } from 'express';
 import excusesService from './service';
 import responseCodes from '../general/responseCodes';
-import { NewExcuse, UpdateExcuse } from './interfaces';
+import { INewExcuse, IUpdateExcuse } from './interfaces';
 
-const getAllExcuses = (req: Request, res: Response) => {
-  const { category } = req.query;
-  const excuses = excusesService.getAllExcuses();
-  if (!category) {
-    return res.status(responseCodes.ok).json({
-      excuses,
-    });
+const getAllExcuses = async (req: Request, res: Response) => {
+  const excuses = await excusesService.getAllExcuses();
+  if (!excuses) {
+    if (excuses) {
+      return res.status(responseCodes.serverError).json({});
+    }
   }
-
   return res.status(responseCodes.ok).json({
     excuses,
   });
 };
 
-const getRandomExcuse = (req: Request, res: Response) => {
-  const excuse = excusesService.getRandomExcuse();
+const getExcusesByCategory = async (req: Request, res: Response) => {
+  const id: number = parseInt(req.params.id, 10);
+  const excuses = await excusesService.getExcusesByCategory(id);
+  if (!excuses) {
+    return res.status(responseCodes.serverError).json({});
+  }
+  return res.status(responseCodes.ok).json({
+    excuses,
+  });
+};
+
+const getRandomExcuse = async (req: Request, res: Response) => {
+  const excuse = await excusesService.getRandomExcuse();
   return res.status(responseCodes.ok).json({
     excuse,
   });
 };
 
-const getExcuseById = (req: Request, res: Response) => {
+const getExcuseById = async (req: Request, res: Response) => {
   const id: number = parseInt(req.params.id, 10);
   if (!id) {
     return res.status(responseCodes.badRequest).json({
       error: 'No valid id provided',
     });
   }
-  const excuse = excusesService.getExcuseById(id);
+  const excuse = await excusesService.getExcuseById(id);
   if (!excuse) {
     return res.status(responseCodes.badRequest).json({
       error: `No excuse found with id: ${id}`,
@@ -42,24 +51,27 @@ const getExcuseById = (req: Request, res: Response) => {
   });
 };
 
-const deleteExcuse = (req: Request, res: Response) => {
+const deleteExcuse = async (req: Request, res: Response) => {
   const id: number = parseInt(req.params.id, 10);
   if (!id) {
     return res.status(responseCodes.badRequest).json({
       error: 'No valid id provided',
     });
   }
-  const excuse = excusesService.getExcuseById(id);
+  const excuse = await excusesService.getExcuseById(id);
   if (!excuse) {
     return res.status(responseCodes.badRequest).json({
       message: `Excuse not found with id: ${id}`,
     });
   }
-  excusesService.deleteExcuse(id);
+  const result = await excusesService.deleteExcuse(id);
+  if (!result) {
+    return res.status(responseCodes.serverError).json({});
+  }
   return res.status(responseCodes.noContent).json({});
 };
 
-const createExcuse = (req: Request, res: Response) => {
+const createExcuse = async (req: Request, res: Response) => {
   const {
     description,
     createdBy,
@@ -67,19 +79,22 @@ const createExcuse = (req: Request, res: Response) => {
     visibility,
   } = req.body;
 
-  const newExcuse: NewExcuse = {
+  const newExcuse: INewExcuse = {
     description,
     createdBy,
     category,
     visibility,
   };
-  const id = excusesService.createExcuse(newExcuse);
+  const id = await excusesService.createExcuse(newExcuse);
+  if (!id) {
+    return res.status(responseCodes.serverError).json({});
+  }
   return res.status(responseCodes.created).json({
     id,
   });
 };
 
-const updateExcuse = (req: Request, res: Response) => {
+const updateExcuse = async (req: Request, res: Response) => {
   const id: number = parseInt(req.params.id, 10);
   const { description, category, visibility } = req.body;
   if (!description && !category && !visibility) {
@@ -87,24 +102,28 @@ const updateExcuse = (req: Request, res: Response) => {
       error: 'Nothing to update',
     });
   }
-  const excuse = excusesService.getExcuseById(id);
+  const excuse = await excusesService.getExcuseById(id);
   if (!excuse) {
     return res.status(responseCodes.badRequest).json({
       error: `No excuse found with id: ${id}`,
     });
   }
-  const excuseToUpdate: UpdateExcuse = {
+  const excuseToUpdate: IUpdateExcuse = {
     id,
-    description,
-    category,
-    visibility,
   };
-  excusesService.updateExcuse(excuseToUpdate);
+  if (description) excuseToUpdate.description = description;
+  if (category) excuseToUpdate.category = category;
+  if (visibility) excuseToUpdate.visibility = visibility;
+  const result = await excusesService.updateExcuse(excuseToUpdate);
+  if (!result) {
+    return res.status(responseCodes.serverError).json({});
+  }
   return res.status(responseCodes.noContent).json({});
 };
 
 const excusesController = {
   getAllExcuses,
+  getExcusesByCategory,
   getRandomExcuse,
   getExcuseById,
   createExcuse,
