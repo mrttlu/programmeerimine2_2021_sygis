@@ -1,7 +1,9 @@
+import { RowDataPacket } from 'mysql2';
+
 /**
  * User interface
  */
-interface NewUser {
+interface INewUser {
   firstName: string;
   lastName: string;
   email: string;
@@ -9,11 +11,11 @@ interface NewUser {
   role: 'Admin' | 'User';
 }
 
-interface User extends NewUser{
+interface IUser extends INewUser, RowDataPacket {
   id: number;
 }
 
-interface UpdateUser {
+interface IUpdateUser {
   id: number;
   firstName?: string;
   lastName?: string;
@@ -22,4 +24,4 @@ interface UpdateUser {
   role?: 'Admin' | 'User';
 }
 
-export { User, UpdateUser, NewUser };
+export { IUser, IUpdateUser, INewUser };

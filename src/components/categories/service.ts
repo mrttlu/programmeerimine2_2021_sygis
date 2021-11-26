@@ -20,7 +20,7 @@ const deleteCategory = (category: Category | undefined) => {
 };
 
 const createCategory = (newCategory: NewCategory) => {
-  const id = db.users.length + 1;
+  const id = db.categories.length + 1;
   const category: Category = {
     id,
     ...newCategory,

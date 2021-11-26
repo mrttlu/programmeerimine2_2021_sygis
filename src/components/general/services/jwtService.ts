@@ -1,10 +1,10 @@
 import jwt from 'jsonwebtoken';
-import { User } from '../../users/interfaces';
+import { IUser } from '../../users/interfaces';
 
 const jwtPassword = 'klönasfölkjnasföjuhwerfiuhWERFOHU';
 
 const jwtService = {
-  sign: async (user: User) => {
+  sign: async (user: IUser) => {
     const payload = {
       id: user.id,
       role: user.role,

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import responseCodes from '../general/responseCodes';
 import usersService from './service';
-import { UpdateUser, NewUser } from './interfaces';
+import { IUpdateUser, INewUser } from './interfaces';
 
 const usersController = {
   getAllUsers: async (req: Request, res: Response) => {
@@ -52,6 +52,7 @@ const usersController = {
     const {
       firstName, lastName, password, email,
     } = req.body;
+
     if (!firstName) {
       return res.status(responseCodes.badRequest).json({
         error: 'First name is required',
@@ -72,7 +73,7 @@ const usersController = {
         error: 'Password is required',
       });
     }
-    const newUser: NewUser = {
+    const newUser: INewUser = {
       firstName,
       lastName,
       email,
@@ -84,15 +85,18 @@ const usersController = {
       id,
     });
   },
-  updateUser: (req: Request, res: Response) => {
+  updateUser: async (req: Request, res: Response) => {
     const id: number = parseInt(req.params.id, 10);
-    const { firstName, lastName } = req.body;
+    const {
+      firstName, lastName, email, password, role,
+    } = req.body;
+    const isAdmin = res.locals.user.role === 'Admin';
     if (!id) {
       return res.status(responseCodes.badRequest).json({
         error: 'No valid id provided',
       });
     }
-    if (!firstName && !lastName) {
+    if (!firstName && !lastName && !email && !password && !role) {
       return res.status(responseCodes.badRequest).json({
         error: 'Nothing to update',
       });
@@ -103,12 +107,18 @@ const usersController = {
         error: `No user found with id: ${id}`,
       });
     }
-    const updateUser: UpdateUser = {
+    const updateUser: IUpdateUser = {
       id,
-      firstName,
-      lastName,
     };
-    usersService.updateUser(updateUser);
+    if (firstName) updateUser.firstName = firstName;
+    if (lastName) updateUser.lastName = lastName;
+    if (email) updateUser.email = email;
+    if (password) updateUser.password = password;
+    if (role && isAdmin) updateUser.role = role === 'Admin' ? 'Admin' : 'User';
+    const result = await usersService.updateUser(updateUser);
+    if (!result) {
+      res.status(responseCodes.serverError).json({});
+    }
     return res.status(responseCodes.noContent).json({});
   },
 };
