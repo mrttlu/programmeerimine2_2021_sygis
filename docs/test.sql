@@ -1,4 +1,6 @@
-DROP SCHEMA excuses;
+SHOW SCHEMAS;
+
+DROP SCHEMA IF EXISTS excuses;
 CREATE SCHEMA excuses;
 USE excuses;
 CREATE TABLE IF NOT EXISTS `excuses`.`users` (

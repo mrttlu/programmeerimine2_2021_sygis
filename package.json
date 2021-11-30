@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon"
+    "start": "nodemon",
+    "docker_start": "docker run --rm --name excuses -p 3306:3306 -d -e MYSQL_ROOT_PASSWORD=my-secret-pw mysql",
+    "docker_stop": "docker stop excuses"
   },
   "repository": {
     "type": "git",
