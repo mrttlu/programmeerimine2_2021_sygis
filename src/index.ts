@@ -11,6 +11,7 @@ import swaggerUi from 'swagger-ui-express';
  * What is CORS?: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
  */
 import cors from 'cors';
+import config from './config';
 /**
  * Import API documentation file
  */
@@ -32,8 +33,6 @@ import excusesMiddlewares from './components/excuses/middlewares';
 import logger from './components/general/loggerMiddleware';
 import isLoggedIn from './components/auth/isLoggedInMiddleware';
 import isAdmin from './components/auth/isAdminMiddleware';
-
-import { port } from './components/general/settings';
 
 /**
  * Create express app
@@ -58,7 +57,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 /**
  * Port number for express app
  */
-// const port = 3000;
+const port = config.port || 3000;
 
 /**
  * API test endpoint

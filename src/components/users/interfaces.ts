@@ -13,6 +13,9 @@ interface INewUser {
 
 interface IUser extends INewUser, RowDataPacket {
   id: number;
+  dateCreated: Date;
+  dateUpdated: Date;
+  dateDeleted: Date | null;
 }
 
 interface IUpdateUser {

@@ -1,7 +1,9 @@
 import jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
 import { IUser } from '../../users/interfaces';
+import config from '../../../config';
 
-const jwtPassword = 'klönasfölkjnasföjuhwerfiuhWERFOHU';
+const tempSecret = uuidv4();
 
 const jwtService = {
   sign: async (user: IUser) => {
@@ -9,12 +11,14 @@ const jwtService = {
       id: user.id,
       role: user.role,
     };
-    const token = await jwt.sign(payload, jwtPassword, { expiresIn: '1h' });
+    const token = await jwt.sign(
+      payload, config.jwt.secret || tempSecret, { expiresIn: config.jwt.expiresIn },
+    );
     return token;
   },
   verify: async (token: string) => {
     try {
-      const verify = await jwt.verify(token, jwtPassword);
+      const verify = await jwt.verify(token, config.jwt.secret || tempSecret);
       return verify;
     } catch (error) {
       // console.log(error);
